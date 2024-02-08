@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Document, Page } from "@react-pdf/renderer";
 
-function PdfComp(props) {
-    const [numPages, setNumPages] = useState();
+function PdfComp({ pdfFile: string }) {
+    const [numPages, setNumPages] = useState<number | undefined>(undefined);
     const [pageNumber, setPageNumber] = useState(1);
   
-    function onDocumentLoadSuccess(numPages) {
+    function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
       setNumPages(numPages);
     }
   
@@ -20,6 +20,7 @@ function PdfComp(props) {
             .map((page) => {
               return (
                 <Page
+                  key={`page_${page}`} // Added a unique key prop
                   pageNumber={page}
                   renderTextLayer={false}
                   renderAnnotationLayer={false}

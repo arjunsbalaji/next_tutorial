@@ -23,7 +23,7 @@ export default function Login() {
         setLoading(false)
     }
     getUser();
-  }, [])
+  })
 
   const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
@@ -77,7 +77,7 @@ export default function Login() {
         </div>
         <button type="submit" className={styles.loginButton}>Login</button>
         <p className={styles.signupOption}>
-          Don't have an account? <Link href="/signup">Sign up</Link>
+          Don &apos; t have an account? <Link href="/signup">Sign up</Link>
         </p>
       </form>
     </div>

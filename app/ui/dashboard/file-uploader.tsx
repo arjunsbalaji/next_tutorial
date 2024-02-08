@@ -20,7 +20,7 @@ const FileUploader = ({userID} : {userID:any}) => {
     return (
       <div {...getRootProps()} className="border-dashed border-4 border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400">
         <input {...getInputProps()} />
-        <p className="text-gray-700">Drag 'n' drop some files here, or click to select files</p>
+        <p className={"text-gray-700"}>Drag &apos; n &apos; drop some files here, or click to select files</p>
       </div>
     );
   };
