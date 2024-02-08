@@ -31,4 +31,3 @@ function PdfComp(props) {
       </div>
     );
   }
-  export default PdfComp;
