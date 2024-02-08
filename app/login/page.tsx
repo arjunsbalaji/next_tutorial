@@ -18,7 +18,7 @@ export default function Login() {
   useEffect(() => {
     async function getUser(){
         const {data: {user}} = await supabase.auth.getUser()
-        console.log('inside login', user)
+        //console.log('inside login', user)
         setUser(user)
         setLoading(false)
     }

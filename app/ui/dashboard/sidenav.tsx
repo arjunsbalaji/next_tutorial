@@ -14,7 +14,8 @@ export default function SideNav() {
 
   const handleSignout = async () => {
     await supabase.auth.signOut();
-    router.replace('/')
+    
+    router.refresh()
     //set user?
   }
 
