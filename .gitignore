@@ -12,6 +12,7 @@
 /.next/
 /out/
 
+/app/ui/history/pdf.tsx
 # production
 /build
 
