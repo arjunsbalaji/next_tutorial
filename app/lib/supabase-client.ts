@@ -4,10 +4,9 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClientComponentClient();
 
-const supabase = createClientComponentClient();//createClient(supabaseUrl as string, supabaseAnonKey as string);
-
-async function uploadFileToSupabase(userID: string, file: File): Promise<string> {
+export async function uploadFileToSupabase(userID: string, file: File): Promise<string> {
   //const fileExt = file.name.split('.').pop();
   //const fileName = `${fileExt}`;
   const filePath = userID + "/" + uuidv4();
@@ -18,6 +17,21 @@ async function uploadFileToSupabase(userID: string, file: File): Promise<string>
   } else throw new Error(error.message);
 
   return filePath; // Or, return the URL or database record as needed
+};
+
+
+export async function checkHowManyCourses(userID: string): Promise<string> {
+  //const fileExt = file.name.split('.').pop();
+  //const fileName = `${fileExt}`;
+  //const filePath = userID + "/" + uuidv4();
+
+  const { data, error } = await supabase.storage.from(`documents/${userID}`).list();
+
+  if (data) {
+    console.log('inside check how many courses:', data)
+  } else throw new Error(error.message);
+
+  return '10'; // Or, return the URL or database record as needed
 };
 
 export default uploadFileToSupabase;

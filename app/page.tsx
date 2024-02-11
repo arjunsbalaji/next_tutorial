@@ -4,6 +4,9 @@ import Link from 'next/link';
 import styles from '@/app/ui/home.module.css';
 import { lusitana } from './ui/fonts';
 import Image from 'next/image';
+import { User, createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { useEffect, useState } from 'react';
 
 export default function Page() {
   return (
@@ -15,7 +18,7 @@ export default function Page() {
         <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 px-6 py-10 md:w-2/5 md:px-20">
         <div className={styles.shape}/>
           <p className={`text-xl text-gray-800 md:text-3xl md:leading-normal ${lusitana.className}`}>
-            <strong>Welcome to Nachi.</strong> Learn on your own terms.
+            <strong>Welcome to Nãchi.</strong> EARNEST LEARNING.
           </p>
           <Link
             href="/login"

@@ -17,6 +17,7 @@ export default function Login() {
 
   useEffect(() => {
     async function getUser(){
+        //setLoading(true)
         const {data: {user}} = await supabase.auth.getUser()
         //console.log('inside login', user)
         setUser(user)
@@ -42,9 +43,9 @@ export default function Login() {
 
   if (loading) {
     return (
-        <h1>
-            loading...
-        </h1>
+        <div className={styles.loaderContainer} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <div className={styles.loader}>Loading...</div>
+        </div>
     )
   }
 

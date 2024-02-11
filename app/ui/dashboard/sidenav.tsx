@@ -4,7 +4,7 @@ import Link from 'next/link';
 import NavLinks from '@/app/ui/dashboard/nav-links';
 import AcmeLogo from '@/app/ui/acme-logo';
 import { PowerIcon } from '@heroicons/react/24/outline';
-import {createClientComponentClient} from '@supabase/auth-helpers-nextjs'
+import {createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation';
 
 export default function SideNav() {
@@ -13,8 +13,17 @@ export default function SideNav() {
   const supabase = createClientComponentClient();
 
   const handleSignout = async () => {
-    await supabase.auth.signOut();
-    
+    //await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error('Error signing out:', error);
+    } else {
+      console.log('no error in SIGNOUT', document.cookie.length)
+      
+
+    }
+
     router.refresh()
     //set user?
   }
