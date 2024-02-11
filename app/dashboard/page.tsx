@@ -10,22 +10,23 @@ import { checkHowManyCourses } from '../lib/supabase-client';
 import styles from './Dashboard.module.css';
 import Link from 'next/link';
 import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+//import { useRouter } from 'next/router';
 
 
 export default async function Page() {
     const cookieStore = cookies();
     const supabase = createServerComponentClient({cookies: () => cookieStore});
     const {data:user} = await supabase.auth.getUser();
-    const router = useRouter();
+    //const router = useRouter();
     const totalPaidInvoices = await fetchLatestInvoices();
 
+    /*
     useEffect(() => {
       if (user === null) {
         router.push('/login');
       }
     }, [user]);
-  
+  */
 
 
   return (

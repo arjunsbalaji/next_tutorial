@@ -5,7 +5,7 @@ import { lusitana } from '@/app/ui/fonts';
 import FileUploader from '@/app/ui/dashboard/file-uploader';
 import { useSearchParams } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Document } from '@react-pdf/renderer';
+import MyPDFViewer from '@/app/ui/my-pdf-viewer';
 
 function NewCoursePage() {
   const supabase = createClientComponentClient();
@@ -13,20 +13,20 @@ function NewCoursePage() {
   const userID = searchParams.get('userID')
   console.log(userID)
 
-  const [document, setDocument] = useState(null);
+  const [document, setDocument] = useState('');
 
   const fetchDocument = async (docID: string) => {
     // Use the Supabase client to fetch the document using the docID
-    const { data, error } = await supabase
+    /*const { data, error } = await supabase
       .from('documents')
       .select("/" + docID)
-  
-    if (error) {
-      console.error('Error fetching document:', error);
-    } else {
-      setDocument(data);
-      console.log("INSIDE FETCH:", data)
-    }
+    */
+    const { data } = await supabase.storage.from("documents").getPublicUrl(docID);
+    console.log("DOCURL", docID, data)
+    const docURL = data.publicUrl
+    setDocument(docURL);
+    
+    
   }
 
 
@@ -44,7 +44,7 @@ function NewCoursePage() {
           <FileUploader userID={userID} onUploadSuccess={fetchDocument}/>
         </div>
         <div>
-          <Document />
+          {document && <MyPDFViewer docURL={document} />}
         </div>
       </div>
   </div>

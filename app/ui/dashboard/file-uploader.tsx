@@ -13,11 +13,11 @@ const FileUploader = ({userID, onUploadSuccess} : {userID:any, onUploadSuccess: 
         // Here you would call the function to upload the file to Supabase
         uploadFileToSupabase(userID, file).then((response) => {
           // Extract the docID from the response
-          const docID = response;
-          console.log(response);
+          const docURL =  response;
+          console.log('RESPONSE',response);
           // Handle the successful upload, like showing a message or updating the state
           setUploadSuccess(true);
-          onUploadSuccess(docID);
+          onUploadSuccess(docURL);
           setIsUploading(false);
         }).catch((error: any) => {
           console.error('Error uploading file:', error);
