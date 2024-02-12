@@ -17,16 +17,60 @@ export default function MyPDFViewer( {docURL} : {docURL:string}  ) {
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
     setNumPages(numPages);
+    setPageNumber(1);
+  }
+  
+  function changePage(offset: number) {
+    setPageNumber(prevPageNumber => prevPageNumber + offset);
   }
 
+  function previousPage() {
+    changePage(-1);
+  }
+
+  function nextPage() {
+    changePage(1);
+  }
   return (
     <div>
       <Document file={docURL} onLoadSuccess={onDocumentLoadSuccess}>
         <Page pageNumber={pageNumber} />
       </Document>
       <p>
-        Page {pageNumber} of {numPages}
+        Page {pageNumber || (numPages ? 1 : '--')} of {numPages || '--'}
       </p>
+      <button 
+        type="button"
+        disabled={pageNumber <= 1}
+        onClick={previousPage}
+        style={{
+          margin: '10px',
+          padding: '10px',
+          backgroundColor: '#007BFF',
+          color: 'white',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+        }}
+      >
+        Previous
+      </button>
+      <button
+        type="button"
+        disabled={pageNumber >= (numPages || Infinity)}
+        onClick={nextPage}
+        style={{
+          margin: '10px',
+          padding: '10px',
+          backgroundColor: '#007BFF',
+          color: 'white',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+        }}
+      >
+        Next
+      </button>
     </div>
   )
 }

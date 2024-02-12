@@ -3,8 +3,10 @@ import {
   ClockIcon,
   UserGroupIcon,
   InboxIcon,
+  ExclamationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
+import React from 'react';
 
 const iconMap = {
   pdf: BanknotesIcon,
@@ -37,7 +39,7 @@ export function Card({
   type,
 }: {
   title: string;
-  value: number | string;
+  value: number | string | React.ReactNode; //react node here in case i want to set up loading icon
   type: 'pdf' | 'doc' | 'url' | 'pic';
 }) {
   const Icon = iconMap[type];
