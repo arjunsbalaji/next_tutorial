@@ -3,6 +3,7 @@ import uploadFileToSupabase from '@/app/lib/supabase-client';
 import React, {useCallback, useState} from 'react'
 import {useDropzone} from 'react-dropzone'
 
+
 const FileUploader = ({userID, onUploadSuccess} : {userID:any, onUploadSuccess: (docID: string) => void}) => {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -10,19 +11,25 @@ const FileUploader = ({userID, onUploadSuccess} : {userID:any, onUploadSuccess: 
     const onDrop = (acceptedFiles: any) => {
       setIsUploading(true);
       acceptedFiles.forEach((file: any) => {
-        // Here you would call the function to upload the file to Supabase
-        uploadFileToSupabase(userID, file).then((response) => {
-          // Extract the docID from the response
-          const docURL =  response;
-          console.log('RESPONSE',response);
-          // Handle the successful upload, like showing a message or updating the state
-          setUploadSuccess(true);
-          onUploadSuccess(docURL);
+        // Check if file is a pdf, txt, or doc
+        if (file.type === 'application/pdf' || file.type === 'text/plain' || file.type === 'application/msword') {
+          // Here you would call the function to upload the file to Supabase
+          uploadFileToSupabase(userID, file).then((response) => {
+            // Extract the docID from the response
+            const docURL =  response;
+            console.log('RESPONSE',response);
+            // Handle the successful upload, like showing a message or updating the state
+            setUploadSuccess(true);
+            onUploadSuccess(docURL);
+            setIsUploading(false);
+          }).catch((error: any) => {
+            console.error('Error uploading file:', error);
+            setIsUploading(false);
+          });
+        } else {
+          console.error('Invalid file type:', file.type);
           setIsUploading(false);
-        }).catch((error: any) => {
-          console.error('Error uploading file:', error);
-          setIsUploading(false);
-        });
+        }
       });
     };
   

@@ -9,12 +9,24 @@ export type User = {
   password: string;
 };
 
-export type Customer = {
-  id: string;
+export type MetadataType = {
+  eTag: string;
+  size: number;
+  mimetype: string;
+  cacheControl: string;
+  lastModified: string;
+  contentLength: number;
+  httpStatusCode: number;
+}
+
+export type RawSupabaseDocType = {
   name: string;
-  email: string;
-  image_url: string;
-};
+  id: string;
+  updated_at: string;
+  created_at: string;
+  last_accessed_at: string;
+  metadata: MetadataType;
+}
 
 export type Invoice = {
   id: string;

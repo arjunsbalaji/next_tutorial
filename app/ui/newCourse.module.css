@@ -1,0 +1,11 @@
+.button {
+    margin: 10px;
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100px; /* Added width to make the buttons the same size */
+    transition: background-color 0.3s ease;
+}

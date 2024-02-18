@@ -1,17 +1,15 @@
 import { Card } from '@/app/ui/dashboard/cards';
-import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import { lusitana } from '@/app/ui/fonts';
-import { fetchLatestInvoices, fetchRevenue } from '../lib/data';
 import { createServerComponentClient, createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import FileUploader from '../ui/dashboard/file-uploader';
 import { Button } from '../ui/button';
 import { checkHowManyCourses } from '../lib/supabase-client';
 import styles from './Dashboard.module.css';
 import Link from 'next/link';
-import { useEffect } from 'react';
+//import { useEffect } from 'react';
 //import { useRouter } from 'next/router';
 
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 export default async function Page() {
     const cookieStore = cookies();
@@ -19,8 +17,8 @@ export default async function Page() {
     //const supabase = cre({cookies: () => cookieStore});
     const {data:user} = await supabase.auth.getUser();
     //const router = useRouter();
-    const totalPaidInvoices = await fetchLatestInvoices();
-    let nCourses = '10'
+    //const totalPaidInvoices = await fetchLatestInvoices();
+    let nCourses = 'L'
 
     if (user) {
       nCourses = await checkHowManyCourses(user.user?.id as string);
@@ -58,7 +56,11 @@ export default async function Page() {
         </Link>
       </div>
       <div className="p-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Card title="Number of Courses" value={nCourses} type="pdf" />
+        {isNaN(Number(nCourses)) ? 
+          <Card title="Number of Courses" value={<ExclamationCircleIcon className="h-5 w-5 text-gray-700" />} type="pic" /> 
+          : 
+          <Card title="Number of Courses" value={nCourses} type="pdf" />
+        }
         <Card title="Lesson Streak" value={'3 days'} type="pic" />
         <Card title="Finished Courses" value={'10'} type="doc" />
       </div>
