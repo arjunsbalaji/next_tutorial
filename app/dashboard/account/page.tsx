@@ -17,8 +17,9 @@ const handleSubmit = () => {
 
 }
 
-/*
+
 export default function AccountPage() {
+  /*
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -26,13 +27,9 @@ export default function AccountPage() {
 
     }
   })
+  */
   return (
     <div>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}
-
-      </Form>
     </div>
   )
 }
-*/

@@ -35,12 +35,16 @@ export default function MyPDFViewer( {docURL, onDisplaySuccess} : {docURL:string
   }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Document file={docURL} onLoadSuccess={onDocumentLoadSuccess} style={{ margin: '0 auto' }}>
-        <Page 
-          pageNumber={pageNumber} 
-          renderAnnotationLayer={false} 
-          renderTextLayer={false} 
-        />
+      <Document 
+        file={docURL} 
+        onLoadSuccess={onDocumentLoadSuccess} 
+        //style={{ margin: '0 auto' }}
+        >
+          <Page 
+            pageNumber={pageNumber} 
+            renderAnnotationLayer={false} 
+            renderTextLayer={false} 
+          />
       </Document>
       <p style={{ textAlign: 'center' }}>
         Page {pageNumber || (numPages ? 1 : '--')} of {numPages || '--'}
