@@ -5,6 +5,9 @@ import ReactPDF from '@react-pdf/renderer'
 import { pdfjs } from 'react-pdf';
 import { Document, Page } from 'react-pdf';
 import './newCourse.module.css';
+import { list } from 'postcss';
+import { TextContent } from 'pdfjs-dist/types/src/display/api';
+
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -26,6 +29,10 @@ export default function MyPDFViewer( {docURL, onDisplaySuccess} : {docURL:string
     setPageNumber(prevPageNumber => prevPageNumber + offset);
   }
 
+  
+
+  
+
   function previousPage() {
     changePage(-1);
   }
@@ -33,6 +40,15 @@ export default function MyPDFViewer( {docURL, onDisplaySuccess} : {docURL:string
   function nextPage() {
     changePage(1);
   }
+
+  function onTextLoadSuccess(page: any) {
+    // Extract text content from the page object if available
+    
+    page.getTextContent().then((textContent: TextContent) => {
+      console.log('Text content of the page:', textContent);
+    });
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Document 
@@ -44,6 +60,7 @@ export default function MyPDFViewer( {docURL, onDisplaySuccess} : {docURL:string
             pageNumber={pageNumber} 
             renderAnnotationLayer={false} 
             renderTextLayer={false} 
+            onLoadSuccess={onTextLoadSuccess}
           />
       </Document>
       <p style={{ textAlign: 'center' }}>

@@ -22,7 +22,7 @@ export default async function Page() {
 
     if (user) {
       nCourses = await checkHowManyCourses(user.user?.id as string);
-      console.log("NCOURSES", nCourses)
+      //console.log("NCOURSES", nCourses)
     } else {
       nCourses = 'N/A'
     }
