@@ -7,24 +7,72 @@ import { useSearchParams } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import MyPDFViewer from '@/app/ui/my-pdf-viewer';
 import { Card } from '@/app/ui/dashboard/cards';
+import { eventNames } from 'process';
 
 
 function NewCourseUpload() {
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams()
   const userID = searchParams.get('userID')
+
+  //const {data:userID} = await supabase.auth.getUser();
+
   //console.log(userID)
 
   const [document, setDocument] = useState('');
   const [numPages, setNumPages] = useState<number>(0);
+  const [pdfID, setPdfID] = useState<string | null>(null);
+  const [docText, setdocText] = useState<string | null>(null);
 
 
   const fetchDocument = async (docID: string) => {
     const { data } = await supabase.storage.from("documents").getPublicUrl(docID);
-    //console.log("DOCURL", docID, data)
+    
     const docURL = data.publicUrl
     setDocument(docURL);
+
+    console.log("DOCURL", docURL)
+    const response = await fetch('https://api.mathpix.com/v3/pdf', {
+      method: 'POST',
+      headers: {
+        "app_id": process.env.NEXT_PUBLIC_MATHPIX_APP_ID as string,
+        "app_key": process.env.NEXT_PUBLIC_MATHPIX_APP_KEY as string,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        page_ranges: "1-2", //this should be programatic but limit to 5 for now
+        url: docURL,
+        conversion_formats: {
+          md: true,
+        }
+      })
+    }).then((response) => response.json()).then((data) => console.log(data))
+
+    //const pdfID = await response.json();
+    //setPdfID(pdfID.pdf_id);
+    //console.log(pdfID)
+
   }
+
+
+  /*  useEffect(() => {
+    const fetchdocText = async () => {
+      const response: Response = await fetch(`https://api.mathpix.com/v3/pdf/${pdfID}`, {
+        method: 'GET',
+        headers: {
+          "app_id": process.env.NEXT_PUBLIC_MATHPIX_APP_ID as string,
+          "app_key": process.env.NEXT_PUBLIC_MATHPIX_APP_KEY as string,
+        }
+      }
+      ).then(data => response.json()).then(json => console.log(json))
+      //const data = await response.json();
+      //console.log(data, pdfID)
+      //setdocText(data);
+      
+    }
+  
+    fetchdocText();
+  }, [pdfID]);*/
 
   const checkNumPages = (numPages:number) => {
     //console.log(numPages);
@@ -81,6 +129,11 @@ function NewCourseUpload() {
               <p className="text-sm text-gray-500">{`Pages: ${numPages} - Let's get started!`}</p>
             )}
           </div>
+        <div>
+          {document && <p className={`${lusitana.className} truncate rounded-xl bg-gray-50 px-4 py-8 text-center text-2xl`}>
+            {`Document Text: ${docText}`}
+          </p>}
+        </div>
         </div>}
     </div>
   )
