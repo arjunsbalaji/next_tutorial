@@ -14,7 +14,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-export default function MyPDFViewer( {docURL, onDisplaySuccess} : {docURL:string, onDisplaySuccess: (numPages: number) => void}  ) {
+export default function MyPDFViewer( {docURL, onDisplaySuccess, onTextExtracted} : {
+    docURL:string,
+    onDisplaySuccess: (numPages: number) => void,
+    onTextExtracted: (text: string) => void}  ) {
 
   const [numPages, setNumPages] = useState<number>();
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -29,10 +32,6 @@ export default function MyPDFViewer( {docURL, onDisplaySuccess} : {docURL:string
     setPageNumber(prevPageNumber => prevPageNumber + offset);
   }
 
-  
-
-  
-
   function previousPage() {
     changePage(-1);
   }
@@ -45,7 +44,10 @@ export default function MyPDFViewer( {docURL, onDisplaySuccess} : {docURL:string
     // Extract text content from the page object if available
     
     page.getTextContent().then((textContent: TextContent) => {
-      console.log('Text content of the page:', textContent);
+      const strings = textContent.items.map(item => item.str);
+      const fullText = strings.join('');
+      console.log('Text content of the page:', fullText);
+      onTextExtracted(fullText);
     });
   }
 
@@ -54,7 +56,6 @@ export default function MyPDFViewer( {docURL, onDisplaySuccess} : {docURL:string
       <Document 
         file={docURL} 
         onLoadSuccess={onDocumentLoadSuccess} 
-        //style={{ margin: '0 auto' }}
         >
           <Page 
             pageNumber={pageNumber} 
