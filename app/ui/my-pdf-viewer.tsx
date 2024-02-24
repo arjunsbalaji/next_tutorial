@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useState } from 'react'
-import ReactPDF from '@react-pdf/renderer'
+//import ReactPDF from '@react-pdf/renderer'
 import { pdfjs } from 'react-pdf';
 import { Document, Page } from 'react-pdf';
 import './newCourse.module.css';
-import { list } from 'postcss';
+//import { list } from 'postcss';
 import { TextContent } from 'pdfjs-dist/types/src/display/api';
 
 
@@ -31,7 +31,7 @@ export default function MyPDFViewer( {docURL, onDisplaySuccess, onTextExtracted}
   function changePage(offset: number) {
     setPageNumber(prevPageNumber => prevPageNumber + offset);
   }
-
+  
   function previousPage() {
     changePage(-1);
   }
@@ -44,9 +44,15 @@ export default function MyPDFViewer( {docURL, onDisplaySuccess, onTextExtracted}
     // Extract text content from the page object if available
     
     page.getTextContent().then((textContent: TextContent) => {
-      const strings = textContent.items.map(item => item.str);
+      //console.log(textContent)
+      const strings = textContent.items.map(item => {
+        if ('str' in item) {
+          return item.str;
+        }
+        return '';
+      });
       const fullText = strings.join('');
-      console.log('Text content of the page:', fullText);
+      //console.log('Text content of the page:', fullText);
       onTextExtracted(fullText);
     });
   }

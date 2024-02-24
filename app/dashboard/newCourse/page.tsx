@@ -7,6 +7,7 @@ export default function NewCourse() {
   const searchParams = useSearchParams()
   const userID = searchParams.get('userID')
 
+  console.log(process.env.NEXT_PUBLIC_OPENAI_API_KEY,process.env.NEXT_PUBLIC_MATHPIX_APP_ID)
   return (
     <div className="flex justify-center items-center h-screen">
       <Link 

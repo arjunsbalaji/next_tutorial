@@ -6,34 +6,44 @@ import FileUploader from '@/app/ui/dashboard/file-uploader';
 import { useSearchParams } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import MyPDFViewer from '@/app/ui/my-pdf-viewer';
-import { Card } from '@/app/ui/dashboard/cards';
-import { eventNames } from 'process';
-import {createRoot} from 'react-dom/client'
-import Markdown from 'react-markdown'
 import DocInfo from '@/app/ui/doc-info';
-import { fetchDocInfo } from "@/app/lib/openai-client";
+import { fetchDocInfo, makeDocNotes } from "@/app/lib/openai-client";
+import { Course } from '@/app/lib/definitions';
 
 
 function NewCourseUpload() {
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams()
   const userID = searchParams.get('userID')
-
   const [document, setDocument] = useState('');
   const [numPages, setNumPages] = useState<number>(0);
   const [pdfID, setPdfID] = useState<string | null>(null);
-  const [docText, setdocText] = useState<string | null>(null);
-  const [docInfo, setDocInfo] = useState<{ title: string; description: string; author: string }>({ title: '', description: '', author: '' });
+  const [docText, setdocText] = useState<string>('');
+  const [editDocText, setEditDocText] = useState(docText);
+  const [docInfo, setDocInfo] = useState<{ title: string; description: string; level:string; subject:string; author: string }>({ title: '', description: '', level:'', subject:'', author: '' });
   const POLL_INTERVAL = 5000;
+
+  const course: Course = {
+    title: '',
+    author: '',
+    description: '',
+    sourceDocumentID: '',
+    text: '',
+    level: '',
+    subject: '',
+    pages: 0,
+    notes: []
+  };
 
   const fetchDocument = async (docID: string) => {
     const { data } = await supabase.storage.from("documents").getPublicUrl(docID);
-    
+
     const docURL = data.publicUrl
     setDocument(docURL);
 
     console.log("DOCURL", docURL)
-    const response = await fetch('https://api.mathpix.com/v3/pdf', {
+
+    /*const response = await fetch('https://api.mathpix.com/v3/pdf', {
       method: 'POST',
       headers: {
         "app_id": process.env.NEXT_PUBLIC_MATHPIX_APP_ID as string,
@@ -42,7 +52,7 @@ function NewCourseUpload() {
       },
       body: JSON.stringify({
         remove_section_numbering: true,
-        page_ranges: "1-2", //this should be programatic but limit to 5 for now
+        page_ranges: "1-2", 
         url: docURL,
         conversion_formats: {
           md: true,
@@ -50,11 +60,8 @@ function NewCourseUpload() {
       })
     }).then((response) => response.json()).then((data) =>{
       setPdfID(data.pdf_id);
-      //pollMathpixForCompletion(data.pdf_id);
-    })
+    })*/
   }
-
-
 
   async function pollMathpixForCompletion(pdfID: string) {
     const url = `https://api.mathpix.com/v3/pdf/${pdfID}`;
@@ -69,55 +76,75 @@ function NewCourseUpload() {
       const checkCompletion = async () => {
         const response = await fetch(url, { method: 'GET', headers: headers });
         const data = await response.json();
-  
+
         if (data.status === 'completed') {
           console.log('Processing completed:', data);
           clearInterval(pollInterval);
-          
+
           const markdownUrl = `${url}.md`;
           const markdownResponse = await fetch(markdownUrl, { headers: headers })
             .then((res) => res.text())
-            .then((data) => setdocText(data));
-          
+            .then((data) => {
+              setdocText(data);
+            });
+
         } else {
           console.log('Processing not yet completed, status:', data.status);
         }
       };
-  
-      
+
       const pollInterval = setInterval(checkCompletion, POLL_INTERVAL);
     } catch (error) {
       console.error('Error polling Mathpix:', error);
-      
-      if (pollInterval) clearInterval(pollInterval); // Ensure we clear the interval if there's an error
+
+      if (pollInterval) clearInterval(pollInterval);
     }
   }
+
+  useEffect(() => {
+    async function fetchDocNotesOAI() {
+      if (docText) {
+        try {
+          const oaiDocSummary = await makeDocNotes(docText);
+          course.text = oaiDocSummary.text;
+          setEditDocText(course.text);
+          console.log(course, course.text)
+        } catch (error) {
+          console.error('Failed to fetch document notes :(', error);
+        }
+      }
+    }
+    fetchDocNotesOAI();
+  }, [docText]);
 
   useEffect(() => {
     async function getDocInfo() {
       if (docText) {
         try {
           const docInfoData = await fetchDocInfo(docText);
+          course.title = docInfoData.title;
+          course.author = docInfoData.author;
+          course.description = docInfoData.description;
+          course.subject = docInfoData.subject;
+          course.level = docInfoData.level;
           setDocInfo(docInfoData);
+
         } catch (error) {
           console.error('Failed to fetch document information:', error);
         }
       }
     }
-
     getDocInfo();
   }, [docText]);
-  
 
-  const checkNumPages = (numPages:number) => {
-    //console.log(numPages);
-    setNumPages(numPages);
+  const checkNumPages = (numPages: number) => {
+    course.pages = numPages
+    setNumPages(course.pages);
   }
 
   function handleTextExtraction(extractedText: string) {
     setdocText(extractedText);
   }
-
 
   return (
     <div>
@@ -128,41 +155,38 @@ function NewCourseUpload() {
       </div>
       <div style={{ paddingBottom: '1rem' }}>
         <FileUploader
-          userID={userID} 
+          userID={userID}
           onUploadSuccess={fetchDocument} />
       </div>
       <div>
-        { document && <DocInfo docInfo={docInfo} />}
+        {document && <DocInfo docInfo={docInfo} />}
       </div>
       <div className="flex py-6">
-          <div className="w-1/2">
-            <div>
-              {document && docText && (
-                <div className={`${lusitana.className} rounded-xl bg-gray-50 p-3 shadow-md px-2 py-2 text-left`}>
-                  <Markdown>{docText}</Markdown>
-                </div>
-              )}
-            </div>
+        <div className="w-1/2">
+          {docText && <h1 className='py-2 px-2 font-bold'>Notes</h1>}
+          <div>
+            {document && docText && (
+              <textarea
+                value={editDocText}
+                onChange={(e) => setEditDocText(e.target.value)}
+                className={`${lusitana.className} rounded-xl bg-gray-50 p-3 shadow-md px-4 py-4 text-left w-full h-128`}
+              />
+            )}
           </div>
-          <div className="w-3/4">
-            {document && <MyPDFViewer 
-                docURL={document}
-                onDisplaySuccess={checkNumPages} 
-                onTextExtracted={handleTextExtraction} />}
-            <div>
-              {numPages > 5 && (
-                <p className="text-center text-sm text-gray-500">
-                  Anything over 5 pages will be cut off. Upgrade to get more!
-                </p>
-              )}
-              {/* : (
-                <p className="text-center text-sm text-gray-500">
-                  {`Pages: ${numPages} - Let's get started!`}
-                </p>
-              )}*/}
-            </div>
+        </div>
+        <div className="w-3/4">
+          {document && <MyPDFViewer
+            docURL={document}
+            onDisplaySuccess={checkNumPages}
+            onTextExtracted={handleTextExtraction} />}
+          <div>
+            {numPages > 5 && (
+              <p className="text-center text-sm text-gray-500">
+                Anything over 5 pages will be cut off. Upgrade to get more!
+              </p>
+            )}
           </div>
-          
+        </div>
       </div>
     </div>
   )

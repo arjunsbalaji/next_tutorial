@@ -9,6 +9,18 @@ export type User = {
   password: string;
 };
 
+export type Course = {
+  title: string;
+  author: string;
+  description: string;
+  sourceDocumentID: string;
+  text: string;
+  level:string;
+  subject:string;
+  pages:number;
+  notes: string[];
+};
+
 export type MetadataType = {
   eTag: string;
   size: number;
